@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Lakewood house board</title>
+  <style>
+    :root {
+      --bg: #f4efe6;
+      --ink: #1c1915;
+      --muted: #6d645b;
+      --line: #e4d9cc;
+      --card: #fffdf9;
+      --beef: #8c3a2f;
+      --chicken: #c4a15a;
+      --pork: #c46b4a;
+      --elk: #5c4636;
+      --pheasant: #7d6b3a;
+      --other: #4f6f64;
+      --brew: #3d342b;
+      --accent: #2f4a3c;
+      --warn: #9a4b2f;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; height: 100%; }
+    body {
+      font-family: "Segoe UI", "Avenir Next", sans-serif;
+      color: var(--ink);
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at 8% 10%, #f6c945 0 18%, transparent 19%),
+        radial-gradient(circle at 92% 0%, #ef7d4c 0 16%, transparent 17%),
+        radial-gradient(circle at 80% 90%, #6db3a4 0 18%, transparent 19%),
+        radial-gradient(circle at 10% 85%, #7aa2d6 0 14%, transparent 15%),
+        linear-gradient(160deg, #fff6df, #f7d7c4 45%, #d7efe8);
+    }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 24px;
+      padding: 28px 36px 18px;
+    }
+    h1 { font-size: 32px; margin: 0; font-weight: 650; letter-spacing: -0.03em; }
+    .sub { color: var(--muted); margin-top: 4px; font-size: 15px; }
+    .clock { text-align: right; }
+    .clock strong { display: block; font-size: 28px; font-weight: 650; }
+    .clock span { color: var(--muted); font-size: 14px; }
+    main {
+      display: grid;
+      grid-template-columns: 300px minmax(280px, 0.9fr) minmax(320px, 1.15fr);
+      gap: 18px;
+      padding: 0 36px 18px;
+    }
+    .recipes {
+      grid-column: 1 / -1;
+    }
+    section {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 20px;
+    }
+    h2 {
+      margin: 0 0 14px;
+      font-size: 18px;
+      letter-spacing: -0.02em;
+    }
+    .gauge-wrap { display: flex; gap: 16px; align-items: center; }
+    .gauge {
+      width: 78px;
+      height: 128px;
+      border: 4px solid #2b241c;
+      border-top-width: 10px;
+      border-radius: 8px 8px 16px 16px;
+      position: relative;
+      overflow: hidden;
+      background: #f3e6d4;
+      flex: 0 0 auto;
+      box-shadow: inset 0 0 0 3px #fff, 0 8px 0 #c9b59a;
+    }
+    .gauge .fill {
+      position: absolute;
+      left: 0; right: 0; bottom: 0;
+      background: linear-gradient(#8a5a32, #4a2e1c);
+      transition: height 0.3s ease;
+    }
+    .gauge.mid .fill { background: linear-gradient(#c9843a, #8a4e22); }
+    .gauge.low .fill { background: linear-gradient(#d15a3a, #8d2e22); }
+    .gauge::after {
+      content: "";
+      position: absolute;
+      left: 8px; right: 8px; top: 8px;
+      height: 8px;
+      border-radius: 4px;
+      background: rgba(255,255,255,0.45);
+    }
+    .stats { display: grid; gap: 8px; flex: 1; }
+    .stat {
+      background: #f7f1e8;
+      border-radius: 12px;
+      padding: 8px 12px;
+    }
+    .stat b { display: block; font-size: 22px; }
+    .stat span { color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: 0.04em; }
+    label { display: block; font-size: 12px; color: var(--muted); margin: 12px 0 4px; }
+    input, select, textarea, button { font: inherit; }
+    input, select, textarea {
+      width: 100%;
+      border: 1px solid var(--line);
+      background: #fff;
+      border-radius: 10px;
+      padding: 8px 10px;
+      color: var(--ink);
+    }
+    textarea { min-height: 220px; resize: vertical; }
+    .row { display: flex; gap: 8px; }
+    .row > * { flex: 1; }
+    button {
+      border: 0;
+      border-radius: 10px;
+      padding: 10px 12px;
+      background: var(--accent);
+      color: white;
+      cursor: pointer;
+    }
+    button.ghost {
+      background: transparent;
+      color: var(--ink);
+      border: 1px solid var(--line);
+    }
+    button.warn { background: var(--warn); }
+    .actions { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+    .hint { color: var(--muted); font-size: 13px; line-height: 1.4; margin: 8px 0 0; }
+    .freezer {
+      background: linear-gradient(#f7fbff, #e7eef5);
+      border: 3px solid #d5dee8;
+      border-radius: 16px;
+      padding: 10px 10px 8px;
+      box-shadow: inset 0 0 0 2px #fff, 0 10px 0 #b9c6d4;
+      margin-bottom: 8px;
+    }
+    .freezer-top {
+      height: 14px;
+      margin: -2px 8px 8px;
+      border-radius: 4px;
+      background: repeating-linear-gradient(90deg, #9aa8b8 0 8px, #d5dee8 8px 12px);
+    }
+    .door {
+      background: #f8fbff;
+      border: 1px solid #d5dee8;
+      border-radius: 10px;
+      min-height: 72px;
+      max-height: 180px;
+      overflow: auto;
+      padding: 4px 8px;
+      position: relative;
+    }
+    .meat-freezer .door { max-height: 150px; }
+    .door::before {
+      content: "";
+      position: absolute;
+      right: 6px;
+      top: 18px;
+      width: 8px;
+      height: 42px;
+      border-radius: 4px;
+      background: #8ea0b3;
+    }
+    .item {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--line);
+    }
+    .item:last-child { border-bottom: 0; }
+    .item strong { display: block; }
+    .item em { color: var(--muted); font-style: normal; font-size: 13px; }
+    .qty { display: flex; align-items: center; gap: 6px; }
+    .qty button {
+      width: 32px; height: 32px; padding: 0;
+      background: #f7f1e8; color: var(--ink); border: 1px solid var(--line);
+    }
+    .cats { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
+    .cats button { background: #f7f1e8; color: var(--ink); border: 1px solid var(--line); }
+    .cats button.on { background: var(--accent); color: white; border-color: var(--accent); }
+    .pill {
+      display: inline-block;
+      font-size: 11px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      padding: 2px 7px;
+      border-radius: 99px;
+      color: white;
+      margin-right: 6px;
+    }
+    .beef { background: var(--beef); }
+    .chicken { background: var(--chicken); color: #2b2416; }
+    .pork { background: var(--pork); }
+    .elk { background: var(--elk); }
+    .pheasant { background: var(--pheasant); }
+    .other { background: var(--other); }
+    .recipes { grid-column: 1 / -1; }
+    .recipe-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 10px;
+      margin-top: 12px;
+    }
+    .recipe-cat {
+      grid-column: 1 / -1;
+      margin: 8px 0 0;
+      font-size: 13px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #6d645b;
+    }
+    a.card, button.card {
+      display: block;
+      text-align: left;
+      text-decoration: none;
+      background: #f7f1e8;
+      color: var(--ink);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 12px 14px;
+    }
+    a.card strong, button.card strong { display: block; font-size: 15px; }
+    a.card span, button.card span { color: var(--muted); font-size: 12px; }
+    .lists { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 14px; }
+    footer {
+      padding: 0 36px 24px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+    @media (max-width: 980px) {
+      main { grid-template-columns: 1fr; padding: 0 16px 20px; }
+      header { padding: 20px 16px 12px; }
+      footer { padding: 0 16px 20px; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div>
+      <h1>House board</h1>
+      <div class="sub">Lakewood kitchen · your page, not the family calendar</div>
+    </div>
+    <div class="clock">
+      <strong id="clock">--:--</strong>
+      <span id="date"></span>
+    </div>
+  </header>
+  <main>
+    <section>
+      <h2>Cold brew</h2>
+      <div class="gauge-wrap">
+        <div class="gauge" id="gauge" aria-hidden="true"><div class="fill" id="fill"></div></div>
+        <div class="stats">
+          <div class="stat"><b id="daysLeft">—</b><span>days left</span></div>
+          <div class="stat"><b id="ozLeft">—</b><span>ounces left</span></div>
+          <div class="stat"><b id="brewBy">—</b><span>brew next</span></div>
+        </div>
+      </div>
+      <label for="started">Batch started</label>
+      <input id="started" type="date" />
+      <div class="row">
+        <div>
+          <label for="gallons">Gallons</label>
+          <input id="gallons" type="number" min="0.5" step="0.5" value="5" />
+        </div>
+        <div>
+          <label for="pints">Pints / day</label>
+          <input id="pints" type="number" min="0.5" step="0.5" value="2" />
+        </div>
+      </div>
+      <div class="actions">
+        <button id="startToday" type="button">Started a batch today</button>
+        <button id="clearBrew" class="ghost" type="button">Clear</button>
+      </div>
+      <p class="hint" id="brewHint">5 gallons is 640 oz. At 2 pints a day that is 20 days. The reminder fires 2 days early so you are not out.</p>
+    </section>
+
+    <section>
+      <h2>Meat freezer</h2>
+      <div class="cats" id="cats">
+        <button type="button" data-cat="all" class="on">All</button>
+        <button type="button" data-cat="beef">Beef</button>
+        <button type="button" data-cat="chicken">Chicken</button>
+        <button type="button" data-cat="pork">Pork</button>
+        <button type="button" data-cat="elk">Elk</button>
+        <button type="button" data-cat="pheasant">Pheasant</button>
+      </div>
+      <div class="freezer meat-freezer">
+        <div class="freezer-top"></div>
+        <div class="door" id="list"></div>
+      </div>
+      <label for="fname">Add a pack</label>
+      <div class="row">
+        <select id="fcat">
+          <option value="beef">Beef</option>
+          <option value="chicken">Chicken</option>
+          <option value="pork">Pork</option>
+          <option value="elk">Elk</option>
+          <option value="pheasant">Pheasant</option>
+        </select>
+        <input id="fname" placeholder="Ground beef, steaks, roasts…" />
+      </div>
+      <div class="row">
+        <input id="fqty" type="number" min="1" step="1" value="1" />
+        <input id="fnote" placeholder="lbs, packs, or a note" />
+      </div>
+      <div class="actions">
+        <button id="addItem" type="button">Add to meat</button>
+      </div>
+    </section>
+
+    <section>
+      <h2>Other freezer</h2>
+      <div class="freezer">
+        <div class="freezer-top"></div>
+        <div class="door" id="otherList"></div>
+      </div>
+      <label for="oname">Add something else</label>
+      <input id="oname" placeholder="Peas, broth, ice cream, leftovers…" />
+      <div class="row">
+        <input id="oqty" type="number" min="1" step="1" value="1" />
+        <input id="onote" placeholder="bags, containers, or a note" />
+      </div>
+      <div class="actions">
+        <button id="addOther" type="button">Add to other</button>
+      </div>
+      <p class="hint">Meat stays on this page for meal planning. Everything else is its own list. Phone add and delete: <a href="https://docs.google.com/spreadsheets/d/1QUImaQbbekzX4ntbCjCsr8ek_cP0VUqck6patlzSHng/edit" target="_blank" rel="noopener">Lakewood house board</a>.</p>
+    </section>
+
+    <section>
+      <h2>Notes</h2>
+      <textarea id="notes" placeholder="Filter due, paint sample, Costco run, whatever you want on this page."></textarea>
+      <div class="actions">
+        <button id="exportBtn" class="ghost" type="button">Export backup</button>
+        <button id="importBtn" class="ghost" type="button">Import backup</button>
+        <input id="importFile" type="file" accept="application/json" hidden />
+      </div>
+      <p class="hint">Saved in this browser. Export a backup before you switch computers. On the Cozyla this file is the Start URL.</p>
+    </section>
+    <section class="recipes">
+      <h2>Recipes</h2>
+      <p class="hint">Tap a card to open it in Google Drive. Sign in once on the Cozyla and these stay one tap for both of you.</p>
+      <div class="recipe-grid" id="recipes"></div>
+      <label for="rname">Add a recipe link</label>
+      <div class="row">
+        <select id="rcat">
+          <option>Baked goods</option>
+          <option>Main courses</option>
+          <option>Meats</option>
+          <option>Jams and preserves</option>
+          <option>Sides</option>
+          <option>Drinks</option>
+          <option>Other</option>
+        </select>
+        <input id="rname" placeholder="Chili, pizza dough…" />
+        <input id="rurl" placeholder="Paste a Google Drive or website link" />
+      </div>
+      <div class="actions">
+        <button id="addRecipe" type="button">Add recipe</button>
+        <a class="card" href="https://drive.google.com/drive/folders/162vi0Rb-sBXwOBSCZJLL7YnJnSz4iLZj" target="_blank" rel="noopener">Open the Recipes folder</a>
+      </div>
+      <div class="lists">
+        <a class="card" href="https://www.anylist.com/" target="_blank" rel="noopener"><strong>AnyList</strong><span>Grocery, Costco, Trips</span></a>
+      </div>
+      <p class="hint">AnyList has no official connection, so this opens the real app site instead of copying items across. Sign in once on the panel. Shopping still lives in AnyList, not on this page.</p>
+    </section>
+  </main>
+  <footer>Ryan’s tab · family calendar, chores, and meals stay on the Cozyla screens.</footer>
+  <script>
+    const KEY = "lakewood-house-board-v1";
+    const OZ_PER_GALLON = 128;
+    const OZ_PER_PINT = 16;
+    const defaultState = {
+      brew: { started: "", gallons: 5, pintsPerDay: 2 },
+      freezer: [],
+      otherFreezer: [],
+      notes: "",
+      filter: "all",
+      recipes: []
+    };
+    const starterRecipes = [
+      { name: "Recipes folder", url: "https://drive.google.com/drive/folders/162vi0Rb-sBXwOBSCZJLL7YnJnSz4iLZj", note: "All of them", category: "Folders" },
+      { name: "Recipe PDFs", url: "https://drive.google.com/drive/folders/1tTJylP7p-aT8BGVwd72m6fJeCsY2hW84", note: "PDF folder", category: "Folders" },
+      { name: "Discard hamburger buns", url: "https://docs.google.com/document/d/1Qa4Ul2l-LxPg3Gspc-UjhOcxpzAYY8BA/edit", note: "Jeni's", category: "Baked goods" },
+      { name: "Same day pizza dough", url: "https://docs.google.com/document/d/1QgteaFrBhlHsoCizoe2MoCnk2yO6cJ_j/edit", note: "Jeni's", category: "Baked goods" },
+      { name: "Sourdough bagels", url: "https://docs.google.com/document/d/1QlQKl0fCatEwvOJBH8top4GiSWM-AVEB/edit", note: "Jeni's", category: "Baked goods" },
+      { name: "Sugar cookies", url: "https://docs.google.com/document/d/1OQWA9ETfCGjdHKD0a2IAwQao1bM2RZBE/edit", note: "Jeni's", category: "Baked goods" },
+      { name: "Pumpkin sourdough", url: "https://docs.google.com/document/d/1-dMkHpEvAJC_7Rg3Q9xC2BibBPdobwQy/edit", note: "Drive", category: "Baked goods" },
+      { name: "Overnight sourdough bread", url: "https://drive.google.com/file/d/1CugrCh9_adHlEIHCOe1C7ICr91iZofjK/view", note: "PDF", category: "Baked goods" },
+      { name: "Bolognese and lasagna", url: "https://docs.google.com/document/d/167HAelWzJhr_z3t6Mmd9Xs_VbQ-7IICL/edit", note: "Jeni's", category: "Main courses" },
+      { name: "Tonkotsu ramen", url: "https://docs.google.com/document/d/1WrSOM4kF0RtIZld5_CwYKx8mgpIK9kPx/edit", note: "Drive", category: "Main courses" },
+      { name: "Mac and cheese", url: "https://docs.google.com/document/d/1uu4VnpB-tQG_cCTJBVDLBDsS0GW8sdB3EYhrdBQHg90/edit", note: "Mindy", category: "Main courses" },
+      { name: "Chicken tinga tacos", url: "https://drive.google.com/file/d/1SKAI0KGD-zCV4OD6bMZWf9PCHP1Jmru7/view", note: "PDF", category: "Main courses" },
+      { name: "Turkey brine", url: "https://docs.google.com/document/d/1nXnLEpdj_RK4kKJrnZH1fPvp1KDgZ5xt/edit", note: "Drive", category: "Meats" },
+      { name: "Jerky", url: "https://docs.google.com/document/d/13-c9yVCSWsrAmRu1xkew9--qYLJvu6_7/edit", note: "Drive", category: "Meats" },
+      { name: "Strawberry rhubarb jam", url: "https://docs.google.com/document/d/1G5GhZT_V-2eV1-0L1ZgCuWXKRYd49D0w/edit", note: "Jeni's", category: "Jams and preserves" }
+    ];
+    const recipeOrder = ["Baked goods", "Main courses", "Meats", "Jams and preserves", "Sides", "Drinks", "Folders", "Other"];
+    let state = load();
+
+    function load() {
+      try {
+        const raw = localStorage.getItem(KEY);
+        if (!raw) {
+          const fresh = structuredClone(defaultState);
+          fresh.recipes = starterRecipes.map(r => ({ ...r, id: uid() }));
+          return fresh;
+        }
+        const parsed = { ...structuredClone(defaultState), ...JSON.parse(raw) };
+        parsed.otherFreezer = parsed.otherFreezer || [];
+        const moved = parsed.freezer.filter(i => i.category === "other");
+        if (moved.length) {
+          parsed.otherFreezer = moved.map(i => ({ ...i, category: "other" })).concat(parsed.otherFreezer);
+          parsed.freezer = parsed.freezer.filter(i => i.category !== "other");
+        }
+        if (!parsed.recipes || !parsed.recipes.length) {
+          parsed.recipes = starterRecipes.map(r => ({ ...r, id: uid() }));
+        } else {
+          const known = Object.fromEntries(starterRecipes.map(r => [r.name, r]));
+          parsed.recipes = parsed.recipes.map(r => ({
+            ...r,
+            category: known[r.name]?.category || r.category || "Other"
+          }));
+          starterRecipes.forEach(r => {
+            if (!parsed.recipes.some(existing => existing.name === r.name)) {
+              parsed.recipes.push({ ...r, id: uid() });
+            }
+          });
+        }
+        return parsed;
+      } catch (e) {
+        return structuredClone(defaultState);
+      }
+    }
+    function save() {
+      localStorage.setItem(KEY, JSON.stringify(state));
+    }
+    function uid() {
+      return Math.random().toString(36).slice(2, 9);
+    }
+    function todayISO() {
+      const d = new Date();
+      const m = String(d.getMonth() + 1).padStart(2, "0");
+      const day = String(d.getDate()).padStart(2, "0");
+      return d.getFullYear() + "-" + m + "-" + day;
+    }
+    function parseISO(iso) {
+      const [y, m, d] = iso.split("-").map(Number);
+      return new Date(y, m - 1, d);
+    }
+    function fmt(d) {
+      return d.toLocaleDateString(undefined, { month: "short", day: "numeric" });
+    }
+
+    function renderClock() {
+      const now = new Date();
+      document.getElementById("clock").textContent = now.toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" });
+      document.getElementById("date").textContent = now.toLocaleDateString(undefined, { weekday: "long", month: "long", day: "numeric" });
+    }
+
+    function renderBrew() {
+      const b = state.brew;
+      document.getElementById("started").value = b.started || "";
+      document.getElementById("gallons").value = b.gallons;
+      document.getElementById("pints").value = b.pintsPerDay;
+      const totalOz = Number(b.gallons) * OZ_PER_GALLON;
+      const perDay = Number(b.pintsPerDay) * OZ_PER_PINT;
+      if (!b.started || !perDay) {
+        document.getElementById("daysLeft").textContent = "—";
+        document.getElementById("ozLeft").textContent = "—";
+        document.getElementById("brewBy").textContent = "—";
+        document.getElementById("fill").style.height = "0%";
+        document.getElementById("gauge").classList.remove("mid", "low");
+        return;
+      }
+      const start = parseISO(b.started);
+      const elapsed = Math.max(0, Math.floor((new Date().setHours(0,0,0,0) - start.getTime()) / 86400000));
+      const used = elapsed * perDay;
+      const left = Math.max(0, totalOz - used);
+      const daysLeft = Math.max(0, Math.ceil(left / perDay));
+      const totalDays = totalOz / perDay;
+      const remind = new Date(start.getTime());
+      remind.setDate(remind.getDate() + Math.max(0, Math.floor(totalDays) - 2));
+      document.getElementById("daysLeft").textContent = String(daysLeft);
+      document.getElementById("ozLeft").textContent = String(Math.round(left));
+      document.getElementById("brewBy").textContent = fmt(remind);
+      const pct = Math.round((left / totalOz) * 100);
+      document.getElementById("fill").style.height = pct + "%";
+      const gauge = document.getElementById("gauge");
+      gauge.classList.remove("mid", "low");
+      if (pct <= 25) gauge.classList.add("low");
+      else if (pct <= 55) gauge.classList.add("mid");
+    }
+
+    function renderFreezer() {
+      const list = document.getElementById("list");
+      const items = state.freezer.filter(i => state.filter === "all" || i.category === state.filter);
+      document.querySelectorAll("#cats button").forEach(btn => {
+        btn.classList.toggle("on", btn.dataset.cat === state.filter);
+      });
+      if (!items.length) {
+        list.innerHTML = '<div class="empty">Nothing logged in this category yet.</div>';
+        return;
+      }
+      list.innerHTML = items.map(item => `
+        <div class="item">
+          <div>
+            <strong><span class="pill ${item.category}">${item.category}</span>${escapeHtml(item.name)}</strong>
+            <em>${escapeHtml(item.note || "no note")} · in ${item.added}</em>
+          </div>
+          <div class="qty">
+            <button type="button" data-dec="${item.id}">−</button>
+            <b>${item.qty}</b>
+            <button type="button" data-inc="${item.id}">+</button>
+          </div>
+        </div>
+      `).join("");
+    }
+
+    function renderOther() {
+      const list = document.getElementById("otherList");
+      if (!state.otherFreezer.length) {
+        list.innerHTML = '<div class="empty">Nothing else logged yet.</div>';
+        return;
+      }
+      list.innerHTML = state.otherFreezer.map(item => `
+        <div class="item">
+          <div>
+            <strong>${escapeHtml(item.name)}</strong>
+            <em>${escapeHtml(item.note || "no note")} · in ${item.added}</em>
+          </div>
+          <div class="qty">
+            <button type="button" data-odec="${item.id}">−</button>
+            <b>${item.qty}</b>
+            <button type="button" data-oinc="${item.id}">+</button>
+          </div>
+        </div>
+      `).join("");
+    }
+    function renderRecipes() {
+      const box = document.getElementById("recipes");
+      const groups = {};
+      state.recipes.forEach(r => {
+        const cat = r.category || "Other";
+        groups[cat] = groups[cat] || [];
+        groups[cat].push(r);
+      });
+      const names = recipeOrder.filter(cat => groups[cat]).concat(
+        Object.keys(groups).filter(cat => !recipeOrder.includes(cat))
+      );
+      box.innerHTML = names.map(cat => `
+        <h3 class="recipe-cat">${escapeHtml(cat)}</h3>
+        ${groups[cat].map(r => `
+          <a class="card" href="${escapeHtml(r.url)}" target="_blank" rel="noopener">
+            <strong>${escapeHtml(r.name)}</strong>
+            <span>${escapeHtml(r.note || "Open")}</span>
+          </a>
+        `).join("")}
+      `).join("");
+    }
+
+    function escapeHtml(s) {
+      return String(s)
+        .replace(/&/g, "\u0026amp;")
+        .replace(/</g, "\u0026lt;")
+        .replace(/>/g, "\u0026gt;")
+        .replace(/"/g, "\u0026quot;")
+        .replace(/'/g, "\u0026#39;");
+    }
+
+    function render() {
+      renderClock();
+      renderBrew();
+      renderFreezer();
+      renderOther();
+      document.getElementById("notes").value = state.notes || "";
+      renderRecipes();
+    }
+
+    document.getElementById("started").addEventListener("change", e => {
+      state.brew.started = e.target.value;
+      save(); renderBrew();
+    });
+    document.getElementById("gallons").addEventListener("change", e => {
+      state.brew.gallons = Number(e.target.value) || 5;
+      save(); renderBrew();
+    });
+    document.getElementById("pints").addEventListener("change", e => {
+      state.brew.pintsPerDay = Number(e.target.value) || 2;
+      save(); renderBrew();
+    });
+    document.getElementById("startToday").addEventListener("click", () => {
+      state.brew.started = todayISO();
+      save(); renderBrew();
+    });
+    document.getElementById("clearBrew").addEventListener("click", () => {
+      state.brew.started = "";
+      save(); renderBrew();
+    });
+    document.getElementById("cats").addEventListener("click", e => {
+      const btn = e.target.closest("button");
+      if (!btn) return;
+      state.filter = btn.dataset.cat;
+      save(); renderFreezer();
+    });
+    document.getElementById("addItem").addEventListener("click", () => {
+      const name = document.getElementById("fname").value.trim();
+      if (!name) return;
+      state.freezer.unshift({
+        id: uid(),
+        category: document.getElementById("fcat").value,
+        name,
+        qty: Math.max(1, Number(document.getElementById("fqty").value) || 1),
+        note: document.getElementById("fnote").value.trim(),
+        added: todayISO()
+      });
+      document.getElementById("fname").value = "";
+      document.getElementById("fnote").value = "";
+      document.getElementById("fqty").value = "1";
+      save(); renderFreezer();
+    });
+    document.getElementById("addOther").addEventListener("click", () => {
+      const name = document.getElementById("oname").value.trim();
+      if (!name) return;
+      state.otherFreezer.unshift({
+        id: uid(),
+        category: "other",
+        name,
+        qty: Math.max(1, Number(document.getElementById("oqty").value) || 1),
+        note: document.getElementById("onote").value.trim(),
+        added: todayISO()
+      });
+      document.getElementById("oname").value = "";
+      document.getElementById("onote").value = "";
+      document.getElementById("oqty").value = "1";
+      save();
+      renderOther();
+    });
+    document.getElementById("otherList").addEventListener("click", e => {
+      const dec = e.target.dataset.odec;
+      const inc = e.target.dataset.oinc;
+      const id = dec || inc;
+      if (!id) return;
+      const item = state.otherFreezer.find(i => i.id === id);
+      if (!item) return;
+      item.qty += inc ? 1 : -1;
+      if (item.qty <= 0) state.otherFreezer = state.otherFreezer.filter(i => i.id !== id);
+      save();
+      renderOther();
+    });
+    document.getElementById("list").addEventListener("click", e => {
+      const dec = e.target.dataset.dec;
+      const inc = e.target.dataset.inc;
+      const id = dec || inc;
+      if (!id) return;
+      const item = state.freezer.find(i => i.id === id);
+      if (!item) return;
+      item.qty += inc ? 1 : -1;
+      if (item.qty <= 0) state.freezer = state.freezer.filter(i => i.id !== id);
+      save(); renderFreezer();
+    });
+    document.getElementById("addRecipe").addEventListener("click", () => {
+      const name = document.getElementById("rname").value.trim();
+      const url = document.getElementById("rurl").value.trim();
+      if (!name || !url) return;
+      state.recipes.unshift({
+        id: uid(),
+        name,
+        url,
+        note: "Added",
+        category: document.getElementById("rcat").value
+      });
+      document.getElementById("rname").value = "";
+      document.getElementById("rurl").value = "";
+      save();
+      renderRecipes();
+    });
+    document.getElementById("notes").addEventListener("input", e => {
+      state.notes = e.target.value;
+      save();
+    });
+    document.getElementById("exportBtn").addEventListener("click", () => {
+      const blob = new Blob([JSON.stringify(state, null, 2)], { type: "application/json" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = "lakewood-house-board.json";
+      a.click();
+      URL.revokeObjectURL(a.href);
+    });
+    document.getElementById("importBtn").addEventListener("click", () => {
+      document.getElementById("importFile").click();
+    });
+    document.getElementById("importFile").addEventListener("change", async e => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const text = await file.text();
+      state = { ...structuredClone(defaultState), ...JSON.parse(text) };
+      save(); render();
+      e.target.value = "";
+    });
+
+    render();
+    setInterval(renderClock, 15000);
+  </script>
+</body>
+</html>
