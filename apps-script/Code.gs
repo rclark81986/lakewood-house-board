@@ -43,7 +43,8 @@ var TABS = {
 var BREW_ROWS = [
   ['started', '', 'Date the current batch started (YYYY-MM-DD). Blank = no batch.'],
   ['gallons', 5, 'Batch size in gallons'],
-  ['pintsPerDay', 2, 'How many pints you drink per day']
+  ['pintsPerDay', 2, 'How many pints you drink per day'],
+  ['poured', 0, 'Pints poured from this batch (the +1 pint button). Resets when a new batch starts.']
 ];
 var MEAT_CATEGORIES = ['beef', 'chicken', 'pork', 'elk', 'seafood', 'wild game'];
 
@@ -133,12 +134,13 @@ function readData_() {
   var tz = ss.getSpreadsheetTimeZone();
 
   // Cold brew (key/value)
-  var brew = { started: '', gallons: 5, pintsPerDay: 2 };
+  var brew = { started: '', gallons: 5, pintsPerDay: 2, poured: 0 };
   rows_(TABS.brew.name).forEach(function (r) {
     var key = String(r[0] || '').trim();
     if (key === 'started') brew.started = dateStr_(r[1], tz);
     if (key === 'gallons') brew.gallons = num_(r[1], 5);
     if (key === 'pintsPerDay') brew.pintsPerDay = num_(r[1], 2);
+    if (key === 'poured') brew.poured = Math.max(0, Math.round(num_(r[1], 0)));
   });
 
   var freezer = itemRows_(TABS.meat.name, true, tz);
@@ -283,22 +285,37 @@ function applyOp_(op) {
   }
 }
 
+/**
+ * Cold brew writes. Absolute keys: started, gallons, pintsPerDay, poured.
+ * pourDelta (+1 / -1 from the pint button) is added to the current poured count,
+ * so taps from two screens both count instead of overwriting each other.
+ */
 function setBrew_(b) {
+  ['started', 'gallons', 'pintsPerDay', 'poured'].forEach(function (key) {
+    if (!(key in b)) return;
+    var value;
+    if (key === 'started') value = String(b.started || '');
+    else if (key === 'poured') value = Math.max(0, Math.round(Number(b.poured) || 0));
+    else value = Number(b[key]) || (key === 'gallons' ? 5 : 2);
+    brewCell_(key).setValue(value);
+  });
+  if ('pourDelta' in b) {
+    var delta = Math.round(Number(b.pourDelta) || 0);
+    if (delta) {
+      var cell = brewCell_('poured');
+      cell.setValue(Math.max(0, Math.round(num_(cell.getValue(), 0)) + delta));
+    }
+  }
+}
+
+/** The Value cell for a Cold Brew key, adding the row if the Sheet doesn't have it yet. */
+function brewCell_(key) {
   var sh = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(TABS.brew.name);
   var vals = rows_(TABS.brew.name);
-  ['started', 'gallons', 'pintsPerDay'].forEach(function (key) {
-    if (!(key in b)) return;
-    var value = key === 'started' ? String(b.started || '') : (Number(b[key]) || (key === 'gallons' ? 5 : 2));
-    var idx = -1;
-    for (var i = 0; i < vals.length; i++) if (String(vals[i][0]).trim() === key) { idx = i; break; }
-    if (idx < 0) {
-      var def = BREW_ROWS.filter(function (r) { return r[0] === key; })[0];
-      appendRow_(sh, [key, value, def ? def[2] : '']);
-      vals = rows_(TABS.brew.name);
-    } else {
-      sh.getRange(idx + 2, 2).setValue(value);
-    }
-  });
+  for (var i = 0; i < vals.length; i++) if (String(vals[i][0]).trim() === key) return sh.getRange(i + 2, 2);
+  var def = BREW_ROWS.filter(function (r) { return r[0] === key; })[0];
+  appendRow_(sh, [key, def ? def[1] : '', def ? def[2] : '']);
+  return sh.getRange(sh.getLastRow(), 2);
 }
 
 function addItem_(tabName, item, isMeat) {
@@ -368,6 +385,11 @@ function ensureSheets_() {
       if (k === 'brew') sh.getRange(2, 1, BREW_ROWS.length, 3).setValues(BREW_ROWS);
       if (k === 'notes') sh.getRange(2, 1).setValue('');
     }
+  });
+  // Older Sheets were made before some Cold Brew rows existed (e.g. "poured"): add any that are missing.
+  var have = rows_(TABS.brew.name).map(function (r) { return String(r[0]).trim(); });
+  BREW_ROWS.forEach(function (r) {
+    if (have.indexOf(r[0]) < 0) appendRow_(ss.getSheetByName(TABS.brew.name), r.slice());
   });
 }
 

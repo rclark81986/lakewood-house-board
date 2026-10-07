@@ -95,6 +95,21 @@
       background: rgba(255,255,255,0.45);
     }
     .stats { display: grid; gap: 8px; flex: 1; }
+    .pour { display: flex; gap: 10px; align-items: stretch; margin-top: 16px; }
+    .pour button { touch-action: manipulation; -webkit-tap-highlight-color: transparent; user-select: none; }
+    .pour-add {
+      flex: 1; min-height: 72px; font-size: 24px; font-weight: 650; letter-spacing: -0.01em;
+      background: var(--brew); border-radius: 14px; box-shadow: 0 5px 0 #1e1914;
+      transition: transform 0.08s ease, box-shadow 0.08s ease;
+    }
+    .pour-add:active, .pour-add.tapped { transform: translateY(3px); box-shadow: 0 2px 0 #1e1914; }
+    .pour-undo {
+      flex: 0 0 76px; min-height: 72px; font-size: 18px; border-radius: 14px;
+      background: #f7f1e8; color: var(--ink); border: 1px solid var(--line);
+    }
+    .pour button:disabled { opacity: 0.4; cursor: default; box-shadow: none; transform: none; }
+    .pour-count { margin-top: 10px; font-size: 15px; color: var(--muted); }
+    .pour-count b { color: var(--ink); font-size: 18px; }
     .stat {
       background: #f7f1e8;
       border-radius: 12px;
@@ -318,6 +333,11 @@
           <div class="stat"><b id="brewBy">—</b><span>brew next</span></div>
         </div>
       </div>
+      <div class="pour">
+        <button id="pourAdd" class="pour-add" type="button">+1 pint</button>
+        <button id="pourUndo" class="pour-undo" type="button" aria-label="Undo one pint">−1</button>
+      </div>
+      <div class="pour-count" id="pourCount">Poured this batch: <b>0</b> pints</div>
       <label for="started">Batch started</label>
       <input id="started" type="date" />
       <div class="row">
@@ -334,7 +354,7 @@
         <button id="startToday" type="button">Started a batch today</button>
         <button id="clearBrew" class="ghost" type="button">Clear</button>
       </div>
-      <p class="hint" id="brewHint">5 gallons is 640 oz. At 2 pints a day that is 20 days. The reminder fires 2 days early so you are not out.</p>
+      <p class="hint" id="brewHint">Tap +1 pint each time you pour one, including extras for company. 5 gallons is 640 oz, or 40 pints.</p>
     </section>
 
     <section>
@@ -450,7 +470,7 @@
       "Sugar cookies", "Pumpkin sourdough", "Overnight sourdough bread", "Bolognese and lasagna", "Tonkotsu ramen", "Mac and cheese",
       "Chicken tinga tacos", "Turkey brine", "Jerky", "Strawberry rhubarb jam"];
     const defaultState = {
-      brew: { started: "", gallons: 5, pintsPerDay: 2 },
+      brew: { started: "", gallons: 5, pintsPerDay: 2, poured: 0 },
       freezer: [],
       otherFreezer: [],
       notes: "",
@@ -583,17 +603,29 @@
       if (document.activeElement !== el) el.value = value;
     }
 
+    function plural(n, word) { return n + " " + word + (n === 1 ? "" : "s"); }
+    function round1(n) { return Math.round(n * 10) / 10; }
+
     function renderBrew() {
       const b = state.brew;
       setIfIdle("started", b.started || "");
       setIfIdle("gallons", b.gallons);
       setIfIdle("pints", b.pintsPerDay);
+      const poured = Math.max(0, Math.round(Number(b.poured) || 0));
+      const hasBatch = /^\d{4}-\d{2}-\d{2}$/.test(b.started || "");
       const totalOz = Number(b.gallons) * OZ_PER_GALLON;
-      const perDay = Number(b.pintsPerDay) * OZ_PER_PINT;
-      if (perDay && totalOz) {
-        document.getElementById("brewHint").textContent = `${b.gallons} gallons is ${Math.round(totalOz)} oz. At ${b.pintsPerDay} pints a day that is ${Math.floor(totalOz / perDay)} days. The reminder fires 2 days early so you are not out.`;
-      }
-      if (!/^\d{4}-\d{2}-\d{2}$/.test(b.started || "") || !perDay) {
+      const totalPints = totalOz / OZ_PER_PINT;
+      const setting = Number(b.pintsPerDay);
+      document.getElementById("pourCount").innerHTML = hasBatch
+        ? `Poured this batch: <b>${poured}</b> ${poured === 1 ? "pint" : "pints"}`
+        : "Start a batch to use the pint counter.";
+      document.getElementById("pourAdd").disabled = !hasBatch;
+      document.getElementById("pourUndo").disabled = !hasBatch || poured <= 0;
+      const hint = document.getElementById("brewHint");
+      if (!hasBatch || !setting || !totalOz) {
+        hint.textContent = totalOz
+          ? `Tap +1 pint each time you pour one, including extras for company. ${b.gallons} gallons is ${Math.round(totalOz)} oz, or ${round1(totalPints)} pints.`
+          : "Set the batch size to see how much is left.";
         document.getElementById("daysLeft").textContent = "—";
         document.getElementById("ozLeft").textContent = "—";
         document.getElementById("brewBy").textContent = "—";
@@ -601,23 +633,31 @@
         document.getElementById("gauge").classList.remove("mid", "low");
         return;
       }
+      const today = new Date(); today.setHours(0, 0, 0, 0);
       const start = parseISO(b.started);
-      const elapsed = Math.max(0, Math.floor((new Date().setHours(0,0,0,0) - start.getTime()) / 86400000));
-      const used = elapsed * perDay;
-      const left = Math.max(0, totalOz - used);
-      const daysLeft = Math.max(0, Math.ceil(left / perDay));
-      const totalDays = totalOz / perDay;
-      const remind = new Date(start.getTime());
-      remind.setDate(remind.getDate() + Math.max(0, Math.floor(totalDays) - 2));
+      const daysIn = Math.max(0, (Date.now() - start.getTime()) / 86400000);   // fractional days since the batch started
+      const left = Math.max(0, totalOz - poured * OZ_PER_PINT);
+      // Pace: your real average once there are 2+ days of taps, otherwise the pints/day setting.
+      const actual = daysIn >= 2 && poured >= 1;
+      const rate = actual ? poured / daysIn : setting;                       // pints per day
+      const daysLeft = Math.max(0, Math.floor(left / OZ_PER_PINT / rate));
+      const from = start > today ? start : today;                            // a batch dated tomorrow counts from then
+      const remind = new Date(from.getTime());
+      remind.setDate(remind.getDate() + Math.max(0, daysLeft - 2));
       document.getElementById("daysLeft").textContent = String(daysLeft);
       document.getElementById("ozLeft").textContent = String(Math.round(left));
-      document.getElementById("brewBy").textContent = fmt(remind);
+      document.getElementById("brewBy").textContent = remind <= today ? "Today" : fmt(remind);
       const pct = Math.round((left / totalOz) * 100);
       document.getElementById("fill").style.height = pct + "%";
       const gauge = document.getElementById("gauge");
       gauge.classList.remove("mid", "low");
       if (pct <= 25) gauge.classList.add("low");
       else if (pct <= 55) gauge.classList.add("mid");
+      const leftPints = round1(left / OZ_PER_PINT);
+      hint.textContent = (actual
+          ? `You're averaging ${round1(rate)} pints a day since ${fmt(start)}, so the ${plural(leftPints, "pint")} left last about ${plural(daysLeft, "day")}.`
+          : `Each tap is one 16 oz pint, and ${leftPints} ${leftPints === 1 ? "pint is" : "pints are"} left. Days left uses your ${setting} pints a day setting until there are 2 days of taps, then your real pace.`)
+        + " Brew next is 2 days before you run out.";
     }
 
     function renderFreezer() {
@@ -779,8 +819,8 @@
     function queue(op) {
       if (!syncOn()) return;
       op.opId = Date.now().toString(36) + uid();
-      if (op.op === "notes" || op.op === "brew") {
-        pending = pending.filter(p => p.op !== op.op || inFlight.has(p.opId));
+      if (op.op === "notes" || isBrewSettings(op)) {
+        pending = pending.filter(p => p.op !== op.op || inFlight.has(p.opId) || (op.op === "brew" && !isBrewSettings(p)));
       }
       pending.push(op);
       savePending();
@@ -788,6 +828,10 @@
       clearTimeout(flushTimer);
       flushTimer = setTimeout(doSync, 400);
     }
+
+    // Pint taps ride on the "brew" op (pourDelta / poured), which an older script just ignores.
+    function isPourOp(op) { return op.op === "brew" && ("pourDelta" in op || "poured" in op); }
+    function isBrewSettings(op) { return op.op === "brew" && !isPourOp(op); }
 
     function hasLocalData() {
       return state.freezer.length || state.otherFreezer.length || (state.notes || "").trim() || state.brew.started || (state.recipeLinks || []).length;
@@ -818,7 +862,7 @@
     function applyServer(resp) {
       const d = resp.data || {};
       const before = JSON.stringify([state.brew, state.freezer, state.otherFreezer, state.notes, state.recipeLinks, state.recipeFolders]);
-      state.brew = { ...defaultState.brew, ...(d.brew || {}) };
+      state.brew = mergeBrew(d.brew || {});
       state.freezer = Array.isArray(d.freezer) ? d.freezer : [];
       state.otherFreezer = Array.isArray(d.otherFreezer) ? d.otherFreezer : [];
       state.recipeLinks = Array.isArray(d.recipeLinks) ? d.recipeLinks : [];
@@ -830,6 +874,33 @@
       if (before !== after) {
         renderBrew(); renderFreezer(); renderOther(); renderRecipes(); renderNotes();
       }
+    }
+
+    function mergeBrew(server) {
+      const local = state.brew || {};
+      const next = { ...defaultState.brew, ...server };
+      delete next.pourLocal;
+      const sameBatch = String(server.started || "") === String(local.started || "");
+      const localPoured = Math.max(0, Number(local.poured) || 0);
+      if (!("poured" in server)) {
+        // Older script: it doesn't store the pint count, so keep this screen's count (reset only if the batch changed).
+        next.poured = sameBatch ? localPoured : 0;
+        next.pourLocal = true;
+        return next;
+      }
+      next.poured = Math.max(0, Number(server.poured) || 0);
+      if (local.pourLocal && sameBatch && localPoured > next.poured) {
+        // First contact after the script was updated: send up the taps this screen counted on its own.
+        next.poured = localPoured;
+        setTimeout(() => queue({ op: "brew", poured: localPoured }), 0);
+      }
+      // Taps not yet saved still count on screen.
+      pending.forEach(op => {
+        if (!isPourOp(op)) return;
+        if ("poured" in op) next.poured = Math.max(0, Number(op.poured) || 0);
+        if ("pourDelta" in op) next.poured = Math.max(0, next.poured + (Number(op.pourDelta) || 0));
+      });
+      return next;
     }
 
     async function doSync() {
@@ -893,14 +964,40 @@
       state.brew.pintsPerDay = Number(e.target.value) || 2;
       brewChanged();
     });
+    function resetPoured() {
+      state.brew.poured = 0;
+      queue({ op: "brew", poured: 0 });
+    }
     document.getElementById("startToday").addEventListener("click", () => {
       state.brew.started = todayISO();
       brewChanged();
+      resetPoured();
+      save(); renderBrew();
     });
     document.getElementById("clearBrew").addEventListener("click", () => {
       state.brew.started = "";
       brewChanged();
+      resetPoured();
+      save(); renderBrew();
     });
+    let lastPourTap = 0;
+    function pour(delta) {
+      const now = Date.now();
+      if (now - lastPourTap < 300) return;   // ignore a ghost double-tap on the touchscreen
+      lastPourTap = now;
+      const cur = Math.max(0, Number(state.brew.poured) || 0);
+      if (!state.brew.started || (delta < 0 && cur <= 0)) return;
+      state.brew.poured = Math.max(0, cur + delta);
+      save(); renderBrew();
+      queue({ op: "brew", pourDelta: delta });
+    }
+    const pourAddBtn = document.getElementById("pourAdd");
+    pourAddBtn.addEventListener("click", () => {
+      pour(1);
+      pourAddBtn.classList.add("tapped");
+      setTimeout(() => pourAddBtn.classList.remove("tapped"), 150);
+    });
+    document.getElementById("pourUndo").addEventListener("click", () => pour(-1));
     document.getElementById("cats").addEventListener("click", e => {
       const btn = e.target.closest("button");
       if (!btn) return;
