@@ -33,6 +33,7 @@
         radial-gradient(circle at 80% 90%, #6db3a4 0 18%, transparent 19%),
         radial-gradient(circle at 10% 85%, #7aa2d6 0 14%, transparent 15%),
         linear-gradient(160deg, #fff6df, #f7d7c4 45%, #d7efe8);
+      background-attachment: fixed;
     }
     header {
       display: flex;
@@ -51,9 +52,6 @@
       grid-template-columns: 300px minmax(280px, 0.9fr) minmax(320px, 1.15fr);
       gap: 18px;
       padding: 0 36px 18px;
-    }
-    .recipes {
-      grid-column: 1 / -1;
     }
     section {
       background: var(--card);
@@ -112,14 +110,16 @@
       border-radius: 10px;
       padding: 8px 10px;
       color: var(--ink);
+      min-height: 44px;
     }
-    textarea { min-height: 220px; resize: vertical; }
+    textarea { min-height: 200px; resize: vertical; line-height: 1.45; }
     .row { display: flex; gap: 8px; }
     .row > * { flex: 1; }
     button {
       border: 0;
       border-radius: 10px;
       padding: 10px 12px;
+      min-height: 44px;
       background: var(--accent);
       color: white;
       cursor: pointer;
@@ -180,11 +180,11 @@
     .item em { color: var(--muted); font-style: normal; font-size: 13px; }
     .qty { display: flex; align-items: center; gap: 6px; }
     .qty button {
-      width: 32px; height: 32px; padding: 0;
+      width: 40px; height: 40px; min-height: 40px; padding: 0; font-size: 20px; line-height: 1;
       background: #f7f1e8; color: var(--ink); border: 1px solid var(--line);
     }
     .cats { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
-    .cats button { background: #f7f1e8; color: var(--ink); border: 1px solid var(--line); }
+    .cats button { background: #f7f1e8; color: var(--ink); border: 1px solid var(--line); min-height: 40px; }
     .cats button.on { background: var(--accent); color: white; border-color: var(--accent); }
     .pill {
       display: inline-block;
@@ -202,7 +202,8 @@
     .elk { background: var(--elk); }
     .pheasant { background: var(--pheasant); }
     .other { background: var(--other); }
-    .recipes { grid-column: 1 / -1; }
+    .recipes, .notes { grid-column: 1 / -1; }
+    .empty { color: var(--muted); padding: 10px 0; }
     .recipe-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
@@ -240,6 +241,56 @@
       header { padding: 20px 16px 12px; }
       footer { padding: 0 16px 20px; }
     }
+    .sync {
+      display: inline-flex; align-items: center; gap: 6px;
+      margin-top: 6px; min-height: 30px; padding: 3px 10px;
+      border-radius: 99px; border: 1px solid var(--line);
+      background: rgba(255,253,249,0.75); color: var(--muted);
+      font-size: 12px; cursor: pointer;
+    }
+    .sync i { width: 8px; height: 8px; border-radius: 50%; background: #b9ad9f; display: inline-block; }
+    .sync.ok i { background: #3f8f5e; }
+    .sync.busy i { background: #c9843a; }
+    .sync.err i { background: var(--warn); }
+    .section-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+    .section-head h2 { margin: 0; }
+    .section-head .card { padding: 10px 14px; font-size: 14px; }
+    .folder-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 12px;
+      margin-top: 14px;
+    }
+    a.folder, button.folder {
+      display: flex; flex-direction: column; justify-content: center;
+      min-height: 84px; width: 100%;
+      text-align: left; text-decoration: none;
+      background: #f7f1e8; color: var(--ink);
+      border: 1px solid var(--line); border-left: 8px solid var(--other);
+      border-radius: 14px; padding: 14px 16px;
+    }
+    .folder strong { font-size: 17px; letter-spacing: -0.01em; }
+    .folder span { color: var(--muted); font-size: 13px; margin-top: 4px; }
+    .folder.f0 { border-left-color: var(--chicken); }
+    .folder.f1 { border-left-color: var(--beef); }
+    .folder.f2 { border-left-color: var(--pork); }
+    .folder.f3 { border-left-color: #7aa2d6; }
+    .folder.f4 { border-left-color: var(--accent); }
+    .folder.f5 { border-left-color: var(--elk); }
+    .folder.f6 { border-left-color: var(--pheasant); }
+    .folder.f7 { border-left-color: #6db3a4; }
+    .drill-head { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-top: 14px; }
+    .drill-head h3 { margin: 0; font-size: 18px; flex: 1; }
+    .drill-head .card { padding: 10px 14px; font-size: 14px; }
+    .recipe-grid a.card { min-height: 64px; display: flex; flex-direction: column; justify-content: center; }
+    .links-head { margin: 18px 0 0; font-size: 13px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+    .link-card { position: relative; }
+    .link-card a.card { padding-right: 52px; height: 100%; }
+    .link-card button.x {
+      position: absolute; top: 50%; right: 6px; transform: translateY(-50%);
+      width: 40px; height: 40px; min-height: 40px; padding: 0;
+      background: transparent; color: var(--muted); border: 1px solid var(--line); font-size: 18px;
+    }
   </style>
 </head>
 <body>
@@ -251,6 +302,7 @@
     <div class="clock">
       <strong id="clock">--:--</strong>
       <span id="date"></span>
+      <div><button type="button" id="syncStatus" class="sync" title="Tap to sync now"><i></i><span id="syncText">Local data</span></button></div>
     </div>
   </header>
   <main>
@@ -332,10 +384,34 @@
       <div class="actions">
         <button id="addOther" type="button">Add to other</button>
       </div>
-      <p class="hint">Meat stays on this page for meal planning. Everything else is its own list. Phone add and delete: <a href="https://docs.google.com/spreadsheets/d/1QUImaQbbekzX4ntbCjCsr8ek_cP0VUqck6patlzSHng/edit" target="_blank" rel="noopener">Lakewood house board</a>.</p>
+      <p class="hint">Meat stays on this page for meal planning. Everything else is its own list. Edit from your phone or computer: <a href="https://docs.google.com/spreadsheets/d/1dorKnT9YhOkBLINXl0ojkjPE8jYPg11P-EWUkI68L8o/edit" target="_blank" rel="noopener">House Board Data</a> (live once sync is on).</p>
     </section>
 
-    <section>
+    <section class="recipes">
+      <div class="section-head">
+        <h2>Recipes</h2>
+        <a class="card" href="https://drive.google.com/drive/folders/162vi0Rb-sBXwOBSCZJLL7YnJnSz4iLZj" target="_blank" rel="noopener">Open the Recipes folder</a>
+      </div>
+      <div id="recipeView"></div>
+      <p class="hint" id="recipeHint"></p>
+      <h3 class="links-head" id="linksHead">Saved web links</h3>
+      <div class="recipe-grid" id="recipeLinks"></div>
+      <label for="rname">Add a recipe link</label>
+      <div class="row">
+        <select id="rcat"></select>
+        <input id="rname" placeholder="Chili, pizza dough…" />
+        <input id="rurl" placeholder="Paste a Google Drive or website link" />
+      </div>
+      <div class="actions">
+        <button id="addRecipe" type="button">Add recipe</button>
+      </div>
+      <div class="lists">
+        <a class="card" href="https://www.anylist.com/" target="_blank" rel="noopener"><strong>AnyList</strong><span>Grocery, Costco, Trips</span></a>
+      </div>
+      <p class="hint">AnyList has no official connection, so this opens the real app site instead of copying items across. Sign in once on the panel. Shopping still lives in AnyList, not on this page.</p>
+    </section>
+
+    <section class="notes">
       <h2>Notes</h2>
       <textarea id="notes" placeholder="Filter due, paint sample, Costco run, whatever you want on this page."></textarea>
       <div class="actions">
@@ -343,106 +419,117 @@
         <button id="importBtn" class="ghost" type="button">Import backup</button>
         <input id="importFile" type="file" accept="application/json" hidden />
       </div>
-      <p class="hint">Saved in this browser. Export a backup before you switch computers. On the Cozyla this file is the Start URL.</p>
-    </section>
-    <section class="recipes">
-      <h2>Recipes</h2>
-      <p class="hint">Tap a card to open it in Google Drive. Sign in once on the Cozyla and these stay one tap for both of you.</p>
-      <div class="recipe-grid" id="recipes"></div>
-      <label for="rname">Add a recipe link</label>
-      <div class="row">
-        <select id="rcat">
-          <option>Baked goods</option>
-          <option>Main courses</option>
-          <option>Meats</option>
-          <option>Jams and preserves</option>
-          <option>Sides</option>
-          <option>Drinks</option>
-          <option>Other</option>
-        </select>
-        <input id="rname" placeholder="Chili, pizza dough…" />
-        <input id="rurl" placeholder="Paste a Google Drive or website link" />
-      </div>
-      <div class="actions">
-        <button id="addRecipe" type="button">Add recipe</button>
-        <a class="card" href="https://drive.google.com/drive/folders/162vi0Rb-sBXwOBSCZJLL7YnJnSz4iLZj" target="_blank" rel="noopener">Open the Recipes folder</a>
-      </div>
-      <div class="lists">
-        <a class="card" href="https://www.anylist.com/" target="_blank" rel="noopener"><strong>AnyList</strong><span>Grocery, Costco, Trips</span></a>
-      </div>
-      <p class="hint">AnyList has no official connection, so this opens the real app site instead of copying items across. Sign in once on the panel. Shopping still lives in AnyList, not on this page.</p>
+      <p class="hint" id="notesHint">Saved in this browser. Export a backup before you switch computers. On the Cozyla this file is the Start URL.</p>
     </section>
   </main>
   <footer>Ryan’s tab · family calendar, chores, and meals stay on the Cozyla screens.</footer>
   <script>
-    const KEY = "lakewood-house-board-v1";
+    const KEY = "lakewood-house-board-v1";          // board data (same key as before, so existing data carries over)
+    const SYNC_KEY = "lakewood-house-board-sync";   // { api, k, everSynced } - set from the Start URL, never committed
+    const PENDING_KEY = "lakewood-house-board-pending";
     const OZ_PER_GALLON = 128;
     const OZ_PER_PINT = 16;
+    const POLL_MS = 60000;
+    const RECIPES_FOLDER = "https://drive.google.com/drive/folders/162vi0Rb-sBXwOBSCZJLL7YnJnSz4iLZj";
+    // Used until the sync script is set up: each category opens its Drive folder.
+    const FALLBACK_FOLDERS = [
+      { id: "15AlepRiOezHvPyo17MfNx4MFxTtfbHvS", name: "Baked Goods" },
+      { id: "1hyiHCMyvTunTtWx-C5B6aT0FXVZ5QpOI", name: "Main Dishes" },
+      { id: "1o2Om73aH1XxHSbxxLJoYDKP7pe5Nhyvw", name: "Desserts" },
+      { id: "1ztCnOGHjNHtSDmTCJh_7bUbVIeEOg4fq", name: "Snacks" },
+      { id: "13tHyrQW_XkB0y0TvqAkDrO8Wgv5nhCOI", name: "Preserves & Pickles" },
+      { id: "1krMX3Hm4994sscXHrgbuERSb2abVtaTW", name: "Cured & Smoked Meats" }
+    ];
+    const HIDDEN_FOLDERS = ["originals", "pdfs"];
+    // Old hard-coded recipe cards (now replaced by the Drive folders). Only links you added yourself are kept.
+    const OLD_STARTER_NAMES = ["Recipes folder", "Recipe PDFs", "Discard hamburger buns", "Same day pizza dough", "Sourdough bagels",
+      "Sugar cookies", "Pumpkin sourdough", "Overnight sourdough bread", "Bolognese and lasagna", "Tonkotsu ramen", "Mac and cheese",
+      "Chicken tinga tacos", "Turkey brine", "Jerky", "Strawberry rhubarb jam"];
     const defaultState = {
       brew: { started: "", gallons: 5, pintsPerDay: 2 },
       freezer: [],
       otherFreezer: [],
       notes: "",
       filter: "all",
-      recipes: []
+      recipeLinks: [],
+      recipeFolders: null
     };
-    const starterRecipes = [
-      { name: "Recipes folder", url: "https://drive.google.com/drive/folders/162vi0Rb-sBXwOBSCZJLL7YnJnSz4iLZj", note: "All of them", category: "Folders" },
-      { name: "Recipe PDFs", url: "https://drive.google.com/drive/folders/1tTJylP7p-aT8BGVwd72m6fJeCsY2hW84", note: "PDF folder", category: "Folders" },
-      { name: "Discard hamburger buns", url: "https://docs.google.com/document/d/1Qa4Ul2l-LxPg3Gspc-UjhOcxpzAYY8BA/edit", note: "Jeni's", category: "Baked goods" },
-      { name: "Same day pizza dough", url: "https://docs.google.com/document/d/1QgteaFrBhlHsoCizoe2MoCnk2yO6cJ_j/edit", note: "Jeni's", category: "Baked goods" },
-      { name: "Sourdough bagels", url: "https://docs.google.com/document/d/1QlQKl0fCatEwvOJBH8top4GiSWM-AVEB/edit", note: "Jeni's", category: "Baked goods" },
-      { name: "Sugar cookies", url: "https://docs.google.com/document/d/1OQWA9ETfCGjdHKD0a2IAwQao1bM2RZBE/edit", note: "Jeni's", category: "Baked goods" },
-      { name: "Pumpkin sourdough", url: "https://docs.google.com/document/d/1-dMkHpEvAJC_7Rg3Q9xC2BibBPdobwQy/edit", note: "Drive", category: "Baked goods" },
-      { name: "Overnight sourdough bread", url: "https://drive.google.com/file/d/1CugrCh9_adHlEIHCOe1C7ICr91iZofjK/view", note: "PDF", category: "Baked goods" },
-      { name: "Bolognese and lasagna", url: "https://docs.google.com/document/d/167HAelWzJhr_z3t6Mmd9Xs_VbQ-7IICL/edit", note: "Jeni's", category: "Main courses" },
-      { name: "Tonkotsu ramen", url: "https://docs.google.com/document/d/1WrSOM4kF0RtIZld5_CwYKx8mgpIK9kPx/edit", note: "Drive", category: "Main courses" },
-      { name: "Mac and cheese", url: "https://docs.google.com/document/d/1uu4VnpB-tQG_cCTJBVDLBDsS0GW8sdB3EYhrdBQHg90/edit", note: "Mindy", category: "Main courses" },
-      { name: "Chicken tinga tacos", url: "https://drive.google.com/file/d/1SKAI0KGD-zCV4OD6bMZWf9PCHP1Jmru7/view", note: "PDF", category: "Main courses" },
-      { name: "Turkey brine", url: "https://docs.google.com/document/d/1nXnLEpdj_RK4kKJrnZH1fPvp1KDgZ5xt/edit", note: "Drive", category: "Meats" },
-      { name: "Jerky", url: "https://docs.google.com/document/d/13-c9yVCSWsrAmRu1xkew9--qYLJvu6_7/edit", note: "Drive", category: "Meats" },
-      { name: "Strawberry rhubarb jam", url: "https://docs.google.com/document/d/1G5GhZT_V-2eV1-0L1ZgCuWXKRYd49D0w/edit", note: "Jeni's", category: "Jams and preserves" }
-    ];
-    const recipeOrder = ["Baked goods", "Main courses", "Meats", "Jams and preserves", "Sides", "Drinks", "Folders", "Other"];
-    let state = load();
 
+    let state = load();
+    let sync = loadSync();
+    let pending = loadPending();
+    let openFolderId = null;
+    let openFolderTimer = null;
+    let syncing = false;
+    let inFlight = new Set();
+    let lastSyncAt = null;
+    let syncError = "";
+    let flushTimer = null;
+    let notesTimer = null;
+
+    // ---------- storage ----------
+    function normalize(raw) {
+      const parsed = { ...structuredClone(defaultState), ...(raw || {}) };
+      parsed.brew = { ...defaultState.brew, ...(parsed.brew || {}) };
+      parsed.freezer = Array.isArray(parsed.freezer) ? parsed.freezer : [];
+      parsed.otherFreezer = Array.isArray(parsed.otherFreezer) ? parsed.otherFreezer : [];
+      const moved = parsed.freezer.filter(i => i.category === "other");
+      if (moved.length) {
+        parsed.otherFreezer = moved.map(i => ({ ...i, category: "other" })).concat(parsed.otherFreezer);
+        parsed.freezer = parsed.freezer.filter(i => i.category !== "other");
+      }
+      if (!Array.isArray(parsed.recipeLinks)) parsed.recipeLinks = [];
+      // Older versions kept every recipe card in "recipes"; keep only the ones added by hand.
+      if (Array.isArray(parsed.recipes)) {
+        parsed.recipes.forEach(r => {
+          if (!r || !r.url || OLD_STARTER_NAMES.includes(r.name)) return;
+          if (parsed.recipeLinks.some(l => l.url === r.url)) return;
+          parsed.recipeLinks.push({ id: r.id || uid(), name: r.name || r.url, url: r.url, note: r.note || "Added", category: r.category || "Other" });
+        });
+        delete parsed.recipes;
+      }
+      return parsed;
+    }
     function load() {
       try {
         const raw = localStorage.getItem(KEY);
-        if (!raw) {
-          const fresh = structuredClone(defaultState);
-          fresh.recipes = starterRecipes.map(r => ({ ...r, id: uid() }));
-          return fresh;
-        }
-        const parsed = { ...structuredClone(defaultState), ...JSON.parse(raw) };
-        parsed.otherFreezer = parsed.otherFreezer || [];
-        const moved = parsed.freezer.filter(i => i.category === "other");
-        if (moved.length) {
-          parsed.otherFreezer = moved.map(i => ({ ...i, category: "other" })).concat(parsed.otherFreezer);
-          parsed.freezer = parsed.freezer.filter(i => i.category !== "other");
-        }
-        if (!parsed.recipes || !parsed.recipes.length) {
-          parsed.recipes = starterRecipes.map(r => ({ ...r, id: uid() }));
-        } else {
-          const known = Object.fromEntries(starterRecipes.map(r => [r.name, r]));
-          parsed.recipes = parsed.recipes.map(r => ({
-            ...r,
-            category: known[r.name]?.category || r.category || "Other"
-          }));
-          starterRecipes.forEach(r => {
-            if (!parsed.recipes.some(existing => existing.name === r.name)) {
-              parsed.recipes.push({ ...r, id: uid() });
-            }
-          });
-        }
-        return parsed;
+        return normalize(raw ? JSON.parse(raw) : null);
       } catch (e) {
         return structuredClone(defaultState);
       }
     }
     function save() {
-      localStorage.setItem(KEY, JSON.stringify(state));
+      try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {}
     }
+    function loadSync() {
+      let cfg = {};
+      try { cfg = JSON.parse(localStorage.getItem(SYNC_KEY) || "{}") || {}; } catch (e) {}
+      // The Start URL carries the connection: ...?api=<Apps Script web app URL>&k=<token>
+      const params = new URLSearchParams(location.search);
+      if (params.get("api") === "off") {
+        cfg = {};
+        localStorage.removeItem(SYNC_KEY);
+      } else if (params.get("api") && params.get("k")) {
+        const api = params.get("api").trim();
+        if (cfg.api !== api) cfg.everSynced = false;
+        cfg.api = api;
+        cfg.k = params.get("k").trim();
+        localStorage.setItem(SYNC_KEY, JSON.stringify(cfg));
+      }
+      if (params.has("api") || params.has("k")) {
+        params.delete("api"); params.delete("k");
+        const q = params.toString();
+        try { history.replaceState(null, "", location.pathname + (q ? "?" + q : "") + location.hash); } catch (e) {}
+      }
+      return cfg;
+    }
+    function saveSync() { localStorage.setItem(SYNC_KEY, JSON.stringify(sync)); }
+    function loadPending() {
+      try { return JSON.parse(localStorage.getItem(PENDING_KEY) || "[]") || []; } catch (e) { return []; }
+    }
+    function savePending() { localStorage.setItem(PENDING_KEY, JSON.stringify(pending)); }
+    function syncOn() { return !!(sync.api && sync.k); }
+
     function uid() {
       return Math.random().toString(36).slice(2, 9);
     }
@@ -459,21 +546,41 @@
     function fmt(d) {
       return d.toLocaleDateString(undefined, { month: "short", day: "numeric" });
     }
+    function escapeHtml(s) {
+      return String(s)
+        .replace(/&/g, "\u0026amp;")
+        .replace(/</g, "\u0026lt;")
+        .replace(/>/g, "\u0026gt;")
+        .replace(/"/g, "\u0026quot;")
+        .replace(/'/g, "\u0026#39;");
+    }
+    function safeUrl(u) {
+      return /^https?:\/\//i.test(String(u || "")) ? String(u) : "#";
+    }
 
+    // ---------- render ----------
     function renderClock() {
       const now = new Date();
       document.getElementById("clock").textContent = now.toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" });
       document.getElementById("date").textContent = now.toLocaleDateString(undefined, { weekday: "long", month: "long", day: "numeric" });
     }
 
+    function setIfIdle(id, value) {
+      const el = document.getElementById(id);
+      if (document.activeElement !== el) el.value = value;
+    }
+
     function renderBrew() {
       const b = state.brew;
-      document.getElementById("started").value = b.started || "";
-      document.getElementById("gallons").value = b.gallons;
-      document.getElementById("pints").value = b.pintsPerDay;
+      setIfIdle("started", b.started || "");
+      setIfIdle("gallons", b.gallons);
+      setIfIdle("pints", b.pintsPerDay);
       const totalOz = Number(b.gallons) * OZ_PER_GALLON;
       const perDay = Number(b.pintsPerDay) * OZ_PER_PINT;
-      if (!b.started || !perDay) {
+      if (perDay && totalOz) {
+        document.getElementById("brewHint").textContent = `${b.gallons} gallons is ${Math.round(totalOz)} oz. At ${b.pintsPerDay} pints a day that is ${Math.floor(totalOz / perDay)} days. The reminder fires 2 days early so you are not out.`;
+      }
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(b.started || "") || !perDay) {
         document.getElementById("daysLeft").textContent = "—";
         document.getElementById("ozLeft").textContent = "—";
         document.getElementById("brewBy").textContent = "—";
@@ -513,13 +620,13 @@
       list.innerHTML = items.map(item => `
         <div class="item">
           <div>
-            <strong><span class="pill ${item.category}">${item.category}</span>${escapeHtml(item.name)}</strong>
-            <em>${escapeHtml(item.note || "no note")} · in ${item.added}</em>
+            <strong><span class="pill ${escapeHtml(item.category)}">${escapeHtml(item.category)}</span>${escapeHtml(item.name)}</strong>
+            <em>${escapeHtml(item.note || "no note")}${item.added ? " · in " + escapeHtml(item.added) : ""}</em>
           </div>
           <div class="qty">
-            <button type="button" data-dec="${item.id}">−</button>
-            <b>${item.qty}</b>
-            <button type="button" data-inc="${item.id}">+</button>
+            <button type="button" data-dec="${escapeHtml(item.id)}" aria-label="One less">−</button>
+            <b>${escapeHtml(item.qty)}</b>
+            <button type="button" data-inc="${escapeHtml(item.id)}" aria-label="One more">+</button>
           </div>
         </div>
       `).join("");
@@ -535,45 +642,114 @@
         <div class="item">
           <div>
             <strong>${escapeHtml(item.name)}</strong>
-            <em>${escapeHtml(item.note || "no note")} · in ${item.added}</em>
+            <em>${escapeHtml(item.note || "no note")}${item.added ? " · in " + escapeHtml(item.added) : ""}</em>
           </div>
           <div class="qty">
-            <button type="button" data-odec="${item.id}">−</button>
-            <b>${item.qty}</b>
-            <button type="button" data-oinc="${item.id}">+</button>
+            <button type="button" data-odec="${escapeHtml(item.id)}" aria-label="One less">−</button>
+            <b>${escapeHtml(item.qty)}</b>
+            <button type="button" data-oinc="${escapeHtml(item.id)}" aria-label="One more">+</button>
           </div>
         </div>
       `).join("");
     }
-    function renderRecipes() {
-      const box = document.getElementById("recipes");
-      const groups = {};
-      state.recipes.forEach(r => {
-        const cat = r.category || "Other";
-        groups[cat] = groups[cat] || [];
-        groups[cat].push(r);
-      });
-      const names = recipeOrder.filter(cat => groups[cat]).concat(
-        Object.keys(groups).filter(cat => !recipeOrder.includes(cat))
-      );
-      box.innerHTML = names.map(cat => `
-        <h3 class="recipe-cat">${escapeHtml(cat)}</h3>
-        ${groups[cat].map(r => `
-          <a class="card" href="${escapeHtml(r.url)}" target="_blank" rel="noopener">
-            <strong>${escapeHtml(r.name)}</strong>
-            <span>${escapeHtml(r.note || "Open")}</span>
-          </a>
-        `).join("")}
-      `).join("");
+
+    function folders() {
+      const live = Array.isArray(state.recipeFolders) ? state.recipeFolders : null;
+      const list = live || FALLBACK_FOLDERS.map(f => ({ ...f, url: "https://drive.google.com/drive/folders/" + f.id }));
+      return list.filter(f => f && f.name && !HIDDEN_FOLDERS.includes(String(f.name).trim().toLowerCase()));
+    }
+    function fileLabel(f) {
+      const kind = /pdf/.test(f.mimeType || "") ? "PDF" : /document/.test(f.mimeType || "") ? "Doc" : "File";
+      const when = f.updated ? " · " + fmt(new Date(f.updated)) : "";
+      return kind + when;
     }
 
-    function escapeHtml(s) {
-      return String(s)
-        .replace(/&/g, "\u0026amp;")
-        .replace(/</g, "\u0026lt;")
-        .replace(/>/g, "\u0026gt;")
-        .replace(/"/g, "\u0026quot;")
-        .replace(/'/g, "\u0026#39;");
+    function renderRecipes() {
+      const view = document.getElementById("recipeView");
+      const hint = document.getElementById("recipeHint");
+      const list = folders();
+      const live = Array.isArray(state.recipeFolders);
+      const open = openFolderId && live ? list.find(f => f.id === openFolderId) : null;
+      if (open) {
+        const files = open.files || [];
+        view.innerHTML = `
+          <div class="drill-head">
+            <button type="button" class="ghost" data-back="1">← All categories</button>
+            <h3>${escapeHtml(open.name)}</h3>
+            <a class="card" href="${escapeHtml(safeUrl(open.url))}" target="_blank" rel="noopener">Open folder in Drive</a>
+          </div>
+          <div class="recipe-grid">
+            ${files.length ? files.map(f => `
+              <a class="card" href="${escapeHtml(safeUrl(f.url))}" target="_blank" rel="noopener">
+                <strong>${escapeHtml(f.name)}</strong>
+                <span>${escapeHtml(fileLabel(f))}</span>
+              </a>`).join("") : '<div class="empty">No recipes in this folder yet. Drop a PDF into it in Drive and it shows up here in a couple of minutes.</div>'}
+          </div>`;
+        hint.textContent = "Tap a recipe to open it. Sign in to Google once on the Cozyla and these stay one tap.";
+      } else {
+        openFolderId = null;
+        view.innerHTML = `<div class="folder-grid">${list.map((f, i) => live ? `
+          <button type="button" class="folder f${i % 8}" data-folder="${escapeHtml(f.id)}">
+            <strong>${escapeHtml(f.name)}</strong>
+            <span>${(f.files || []).length} recipe${(f.files || []).length === 1 ? "" : "s"}</span>
+          </button>` : `
+          <a class="folder f${i % 8}" href="${escapeHtml(safeUrl(f.url))}" target="_blank" rel="noopener">
+            <strong>${escapeHtml(f.name)}</strong>
+            <span>Open in Drive</span>
+          </a>`).join("")}</div>`;
+        hint.textContent = live
+          ? "Tap a category to see its recipes. Add a PDF to one of these folders in Drive (or make a new folder) and it shows up here on its own."
+          : "Each category opens its folder in Google Drive. Add a PDF to a folder and it's there next time you open it.";
+      }
+
+      const cats = list.map(f => f.name).concat(["Other"]);
+      const sel = document.getElementById("rcat");
+      const cur = sel.value;
+      sel.innerHTML = cats.map(c => `<option>${escapeHtml(c)}</option>`).join("");
+      if (cats.includes(cur)) sel.value = cur;
+
+      const links = state.recipeLinks || [];
+      document.getElementById("linksHead").hidden = !links.length;
+      document.getElementById("recipeLinks").innerHTML = links.map(l => `
+        <div class="link-card">
+          <a class="card" href="${escapeHtml(safeUrl(l.url))}" target="_blank" rel="noopener">
+            <strong>${escapeHtml(l.name)}</strong>
+            <span>${escapeHtml(l.category || "Other")}${l.note && l.note !== "Added" ? " · " + escapeHtml(l.note) : ""}</span>
+          </a>
+          <button type="button" class="x" data-unlink="${escapeHtml(l.id)}" aria-label="Remove link">×</button>
+        </div>`).join("");
+    }
+
+    function renderNotes() {
+      setIfIdle("notes", state.notes || "");
+      document.getElementById("notesHint").textContent = syncOn()
+        ? "Synced with the House Board Data sheet, so edits here and on your computer or phone show up in both places. Export a backup anytime."
+        : "Saved in this browser. Export a backup before you switch computers. On the Cozyla this file is the Start URL.";
+    }
+
+    function renderStatus() {
+      const btn = document.getElementById("syncStatus");
+      const text = document.getElementById("syncText");
+      btn.classList.remove("ok", "busy", "err");
+      const unsaved = pending.length ? ` · ${pending.length} unsaved` : "";
+      if (!syncOn()) {
+        text.textContent = "Local data · not synced";
+        btn.title = "This board saves on this screen only. Add ?api=...&k=... to the Start URL to sync with the Sheet.";
+      } else if (syncing) {
+        btn.classList.add("busy");
+        text.textContent = "Syncing…";
+      } else if (syncError) {
+        btn.classList.add("err");
+        text.textContent = (syncError === "unauthorized" ? "Sync key rejected · local data" : "Offline · local data") + unsaved;
+        btn.title = "Last error: " + syncError + ". Tap to retry.";
+      } else if (lastSyncAt) {
+        btn.classList.add(pending.length ? "busy" : "ok");
+        text.textContent = "Synced " + lastSyncAt.toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" }) + unsaved;
+        btn.title = "Tap to sync now";
+      } else {
+        btn.classList.add("busy");
+        text.textContent = "Connecting…";
+      }
     }
 
     function render() {
@@ -581,29 +757,136 @@
       renderBrew();
       renderFreezer();
       renderOther();
-      document.getElementById("notes").value = state.notes || "";
       renderRecipes();
+      renderNotes();
+      renderStatus();
     }
 
+    // ---------- sync with the Apps Script web app ----------
+    function queue(op) {
+      if (!syncOn()) return;
+      op.opId = Date.now().toString(36) + uid();
+      if (op.op === "notes" || op.op === "brew") {
+        pending = pending.filter(p => p.op !== op.op || inFlight.has(p.opId));
+      }
+      pending.push(op);
+      savePending();
+      renderStatus();
+      clearTimeout(flushTimer);
+      flushTimer = setTimeout(doSync, 400);
+    }
+
+    function hasLocalData() {
+      return state.freezer.length || state.otherFreezer.length || (state.notes || "").trim() || state.brew.started || (state.recipeLinks || []).length;
+    }
+
+    async function api(method, payload) {
+      const url = new URL(sync.api);
+      let res;
+      if (method === "GET") {
+        url.searchParams.set("k", sync.k);
+        url.searchParams.set("t", Date.now());
+        res = await fetch(url.toString(), { method: "GET", cache: "no-store", redirect: "follow" });
+      } else {
+        // text/plain keeps this a "simple" request, so the browser skips the CORS preflight Apps Script can't answer.
+        res = await fetch(url.toString(), {
+          method: "POST",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify({ k: sync.k, ...payload }),
+          redirect: "follow"
+        });
+      }
+      if (!res.ok) throw new Error("HTTP " + res.status);
+      const data = await res.json();
+      if (!data || !data.ok) throw new Error((data && data.error) || "bad response");
+      return data;
+    }
+
+    function applyServer(resp) {
+      const d = resp.data || {};
+      const before = JSON.stringify([state.brew, state.freezer, state.otherFreezer, state.notes, state.recipeLinks, state.recipeFolders]);
+      state.brew = { ...defaultState.brew, ...(d.brew || {}) };
+      state.freezer = Array.isArray(d.freezer) ? d.freezer : [];
+      state.otherFreezer = Array.isArray(d.otherFreezer) ? d.otherFreezer : [];
+      state.recipeLinks = Array.isArray(d.recipeLinks) ? d.recipeLinks : [];
+      const notesFocused = document.activeElement === document.getElementById("notes");
+      if (!notesFocused && !notesTimer) state.notes = String(d.notes || "");
+      if (Array.isArray(resp.recipeFolders)) state.recipeFolders = resp.recipeFolders;
+      const after = JSON.stringify([state.brew, state.freezer, state.otherFreezer, state.notes, state.recipeLinks, state.recipeFolders]);
+      save();
+      if (before !== after) {
+        renderBrew(); renderFreezer(); renderOther(); renderRecipes(); renderNotes();
+      }
+    }
+
+    async function doSync() {
+      if (!syncOn() || syncing) return;
+      clearTimeout(flushTimer);
+      syncing = true;
+      renderStatus();
+      let again = false;
+      try {
+        // First time this screen connects: push up anything it saved locally before sync existed (merged, never wiped).
+        if (!sync.everSynced && hasLocalData() && !pending.some(p => p.op === "mergeLocal")) {
+          pending.unshift({ op: "mergeLocal", opId: "merge-" + Date.now().toString(36) + uid(), state: {
+            brew: state.brew, freezer: state.freezer, otherFreezer: state.otherFreezer, notes: state.notes, recipeLinks: state.recipeLinks } });
+          savePending();
+        }
+        let resp;
+        if (pending.length) {
+          const batch = pending.slice();
+          batch.forEach(op => inFlight.add(op.opId));
+          try {
+            resp = await api("POST", { ops: batch });
+          } finally {
+            batch.forEach(op => inFlight.delete(op.opId));
+          }
+          const sent = new Set(batch.map(op => op.opId));
+          pending = pending.filter(op => !sent.has(op.opId));
+          savePending();
+          if (pending.length) again = true;   // more edits came in while saving; don't overwrite them yet
+          else resp = await api("GET");        // fresh copy, including recipe folders
+        } else {
+          resp = await api("GET");
+        }
+        if (!again && resp) applyServer(resp);
+        sync.everSynced = true;
+        saveSync();
+        lastSyncAt = new Date();
+        syncError = "";
+      } catch (e) {
+        syncError = String(e && e.message || e);
+      } finally {
+        syncing = false;
+        renderStatus();
+        if (again) flushTimer = setTimeout(doSync, 300);
+      }
+    }
+
+    // ---------- events ----------
+    function brewChanged() {
+      save(); renderBrew();
+      queue({ op: "brew", started: state.brew.started, gallons: state.brew.gallons, pintsPerDay: state.brew.pintsPerDay });
+    }
     document.getElementById("started").addEventListener("change", e => {
       state.brew.started = e.target.value;
-      save(); renderBrew();
+      brewChanged();
     });
     document.getElementById("gallons").addEventListener("change", e => {
       state.brew.gallons = Number(e.target.value) || 5;
-      save(); renderBrew();
+      brewChanged();
     });
     document.getElementById("pints").addEventListener("change", e => {
       state.brew.pintsPerDay = Number(e.target.value) || 2;
-      save(); renderBrew();
+      brewChanged();
     });
     document.getElementById("startToday").addEventListener("click", () => {
       state.brew.started = todayISO();
-      save(); renderBrew();
+      brewChanged();
     });
     document.getElementById("clearBrew").addEventListener("click", () => {
       state.brew.started = "";
-      save(); renderBrew();
+      brewChanged();
     });
     document.getElementById("cats").addEventListener("click", e => {
       const btn = e.target.closest("button");
@@ -614,35 +897,39 @@
     document.getElementById("addItem").addEventListener("click", () => {
       const name = document.getElementById("fname").value.trim();
       if (!name) return;
-      state.freezer.unshift({
+      const item = {
         id: uid(),
         category: document.getElementById("fcat").value,
         name,
         qty: Math.max(1, Number(document.getElementById("fqty").value) || 1),
         note: document.getElementById("fnote").value.trim(),
         added: todayISO()
-      });
+      };
+      state.freezer.unshift(item);
       document.getElementById("fname").value = "";
       document.getElementById("fnote").value = "";
       document.getElementById("fqty").value = "1";
       save(); renderFreezer();
+      queue({ op: "addMeat", item });
     });
     document.getElementById("addOther").addEventListener("click", () => {
       const name = document.getElementById("oname").value.trim();
       if (!name) return;
-      state.otherFreezer.unshift({
+      const item = {
         id: uid(),
         category: "other",
         name,
         qty: Math.max(1, Number(document.getElementById("oqty").value) || 1),
         note: document.getElementById("onote").value.trim(),
         added: todayISO()
-      });
+      };
+      state.otherFreezer.unshift(item);
       document.getElementById("oname").value = "";
       document.getElementById("onote").value = "";
       document.getElementById("oqty").value = "1";
       save();
       renderOther();
+      queue({ op: "addOther", item });
     });
     document.getElementById("otherList").addEventListener("click", e => {
       const dec = e.target.dataset.odec;
@@ -651,10 +938,11 @@
       if (!id) return;
       const item = state.otherFreezer.find(i => i.id === id);
       if (!item) return;
-      item.qty += inc ? 1 : -1;
+      item.qty = Number(item.qty) + (inc ? 1 : -1);
       if (item.qty <= 0) state.otherFreezer = state.otherFreezer.filter(i => i.id !== id);
       save();
       renderOther();
+      queue({ op: "qty", list: "other", id, delta: inc ? 1 : -1 });
     });
     document.getElementById("list").addEventListener("click", e => {
       const dec = e.target.dataset.dec;
@@ -663,32 +951,62 @@
       if (!id) return;
       const item = state.freezer.find(i => i.id === id);
       if (!item) return;
-      item.qty += inc ? 1 : -1;
+      item.qty = Number(item.qty) + (inc ? 1 : -1);
       if (item.qty <= 0) state.freezer = state.freezer.filter(i => i.id !== id);
       save(); renderFreezer();
+      queue({ op: "qty", list: "meat", id, delta: inc ? 1 : -1 });
+    });
+    document.getElementById("recipeView").addEventListener("click", e => {
+      const back = e.target.closest("[data-back]");
+      const folder = e.target.closest("[data-folder]");
+      if (back) openFolderId = null;
+      else if (folder) openFolderId = folder.dataset.folder;
+      else return;
+      clearTimeout(openFolderTimer);
+      // Drift back to the category view after a few idle minutes, so the board starts fresh next time.
+      if (openFolderId) openFolderTimer = setTimeout(() => { openFolderId = null; renderRecipes(); }, 5 * 60000);
+      renderRecipes();
+      document.querySelector(".recipes").scrollIntoView({ block: "nearest", behavior: "smooth" });
+    });
+    document.getElementById("recipeLinks").addEventListener("click", e => {
+      const id = e.target.dataset.unlink;
+      if (!id) return;
+      const link = state.recipeLinks.find(l => l.id === id);
+      if (!link || !confirm(`Remove the link "${link.name}"?`)) return;
+      state.recipeLinks = state.recipeLinks.filter(l => l.id !== id);
+      save(); renderRecipes();
+      queue({ op: "removeLink", id });
     });
     document.getElementById("addRecipe").addEventListener("click", () => {
       const name = document.getElementById("rname").value.trim();
-      const url = document.getElementById("rurl").value.trim();
+      let url = document.getElementById("rurl").value.trim();
       if (!name || !url) return;
-      state.recipes.unshift({
-        id: uid(),
-        name,
-        url,
-        note: "Added",
-        category: document.getElementById("rcat").value
-      });
+      if (!/^https?:\/\//i.test(url)) url = "https://" + url;
+      const link = { id: uid(), name, url, note: "Added", category: document.getElementById("rcat").value };
+      state.recipeLinks.unshift(link);
       document.getElementById("rname").value = "";
       document.getElementById("rurl").value = "";
       save();
       renderRecipes();
+      queue({ op: "addLink", link });
     });
-    document.getElementById("notes").addEventListener("input", e => {
+    const notesEl = document.getElementById("notes");
+    function flushNotes() {
+      if (!notesTimer) return;
+      clearTimeout(notesTimer);
+      notesTimer = null;
+      queue({ op: "notes", text: state.notes });
+    }
+    notesEl.addEventListener("input", e => {
       state.notes = e.target.value;
       save();
+      clearTimeout(notesTimer);
+      notesTimer = setTimeout(flushNotes, 1500);
     });
+    notesEl.addEventListener("blur", flushNotes);
     document.getElementById("exportBtn").addEventListener("click", () => {
-      const blob = new Blob([JSON.stringify(state, null, 2)], { type: "application/json" });
+      const { recipeFolders, ...data } = state;
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
       const a = document.createElement("a");
       a.href = URL.createObjectURL(blob);
       a.download = "lakewood-house-board.json";
@@ -702,13 +1020,24 @@
       const file = e.target.files[0];
       if (!file) return;
       const text = await file.text();
-      state = { ...structuredClone(defaultState), ...JSON.parse(text) };
+      const folders = state.recipeFolders;
+      state = normalize(JSON.parse(text));
+      state.recipeFolders = folders;
       save(); render();
       e.target.value = "";
+      queue({ op: "replaceAll", state: { brew: state.brew, freezer: state.freezer, otherFreezer: state.otherFreezer, notes: state.notes, recipeLinks: state.recipeLinks } });
     });
+    document.getElementById("syncStatus").addEventListener("click", () => doSync());
 
     render();
     setInterval(renderClock, 15000);
+    if (syncOn()) {
+      doSync();
+      setInterval(doSync, POLL_MS);
+      document.addEventListener("visibilitychange", () => { if (!document.hidden) doSync(); });
+      window.addEventListener("focus", () => doSync());
+      window.addEventListener("online", () => doSync());
+    }
   </script>
 </body>
 </html>
