@@ -16,6 +16,7 @@
       --pork: #c46b4a;
       --elk: #5c4636;
       --pheasant: #7d6b3a;
+      --seafood: #2f6f8f;
       --other: #4f6f64;
       --brew: #3d342b;
       --accent: #2f4a3c;
@@ -201,6 +202,7 @@
     .pork { background: var(--pork); }
     .elk { background: var(--elk); }
     .pheasant { background: var(--pheasant); }
+    .seafood { background: var(--seafood); }
     .other { background: var(--other); }
     .recipes, .notes { grid-column: 1 / -1; }
     .empty { color: var(--muted); padding: 10px 0; }
@@ -344,6 +346,7 @@
         <button type="button" data-cat="pork">Pork</button>
         <button type="button" data-cat="elk">Elk</button>
         <button type="button" data-cat="pheasant">Pheasant</button>
+        <button type="button" data-cat="seafood">Seafood</button>
       </div>
       <div class="freezer meat-freezer">
         <div class="freezer-top"></div>
@@ -357,6 +360,7 @@
           <option value="pork">Pork</option>
           <option value="elk">Elk</option>
           <option value="pheasant">Pheasant</option>
+          <option value="seafood">Seafood</option>
         </select>
         <input id="fname" placeholder="Ground beef, steaks, roasts…" />
       </div>

@@ -45,7 +45,7 @@ var BREW_ROWS = [
   ['gallons', 5, 'Batch size in gallons'],
   ['pintsPerDay', 2, 'How many pints you drink per day']
 ];
-var MEAT_CATEGORIES = ['beef', 'chicken', 'pork', 'elk', 'pheasant'];
+var MEAT_CATEGORIES = ['beef', 'chicken', 'pork', 'elk', 'pheasant', 'seafood'];
 
 // ---- Web app entry points -------------------------------------------------
 function doGet(e) {
