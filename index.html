@@ -201,7 +201,7 @@
     .chicken { background: var(--chicken); color: #2b2416; }
     .pork { background: var(--pork); }
     .elk { background: var(--elk); }
-    .pheasant { background: var(--pheasant); }
+    .pheasant, .wild-game { background: var(--pheasant); }
     .seafood { background: var(--seafood); }
     .other { background: var(--other); }
     .recipes, .notes { grid-column: 1 / -1; }
@@ -345,8 +345,8 @@
         <button type="button" data-cat="chicken">Chicken</button>
         <button type="button" data-cat="pork">Pork</button>
         <button type="button" data-cat="elk">Elk</button>
-        <button type="button" data-cat="pheasant">Pheasant</button>
         <button type="button" data-cat="seafood">Seafood</button>
+        <button type="button" data-cat="wild game">Other Wild Game</button>
       </div>
       <div class="freezer meat-freezer">
         <div class="freezer-top"></div>
@@ -359,8 +359,8 @@
           <option value="chicken">Chicken</option>
           <option value="pork">Pork</option>
           <option value="elk">Elk</option>
-          <option value="pheasant">Pheasant</option>
           <option value="seafood">Seafood</option>
+          <option value="wild game">Other Wild Game</option>
         </select>
         <input id="fname" placeholder="Ground beef, steaks, roasts…" />
       </div>
@@ -470,6 +470,15 @@
     let syncError = "";
     let flushTimer = null;
     let notesTimer = null;
+
+    // ---------- categories ----------
+    const CAT_LABELS = { beef: "Beef", chicken: "Chicken", pork: "Pork", elk: "Elk", seafood: "Seafood", "wild game": "Other Wild Game" };
+    function catKey(c) {
+      const k = String(c || "beef").trim().toLowerCase();
+      return (k === "pheasant" || k === "other wild game" || k === "wildgame") ? "wild game" : k;
+    }
+    function catLabel(c) { const k = catKey(c); return CAT_LABELS[k] || k; }
+    function catClass(c) { return catKey(c).replace(/[^a-z0-9]+/g, "-"); }
 
     // ---------- storage ----------
     function normalize(raw) {
@@ -613,7 +622,7 @@
 
     function renderFreezer() {
       const list = document.getElementById("list");
-      const items = state.freezer.filter(i => state.filter === "all" || i.category === state.filter);
+      const items = state.freezer.filter(i => state.filter === "all" || catKey(i.category) === state.filter);
       document.querySelectorAll("#cats button").forEach(btn => {
         btn.classList.toggle("on", btn.dataset.cat === state.filter);
       });
@@ -624,7 +633,7 @@
       list.innerHTML = items.map(item => `
         <div class="item">
           <div>
-            <strong><span class="pill ${escapeHtml(item.category)}">${escapeHtml(item.category)}</span>${escapeHtml(item.name)}</strong>
+            <strong><span class="pill ${escapeHtml(catClass(item.category))}">${escapeHtml(catLabel(item.category))}</span>${escapeHtml(item.name)}</strong>
             <em>${escapeHtml(item.note || "no note")}${item.added ? " · in " + escapeHtml(item.added) : ""}</em>
           </div>
           <div class="qty">
