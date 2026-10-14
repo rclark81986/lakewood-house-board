@@ -4,6 +4,12 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Lakewood house board</title>
+  <link rel="manifest" href="manifest.webmanifest" />
+  <meta name="theme-color" content="#2f4a3c" />
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-title" content="House Board" />
   <style>
     :root {
       --bg: #f4efe6;
@@ -1147,6 +1153,11 @@
       document.addEventListener("visibilitychange", () => { if (!document.hidden) doSync(); });
       window.addEventListener("focus", () => doSync());
       window.addEventListener("online", () => doSync());
+    }
+  </script>
+  <script>
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => { navigator.serviceWorker.register("sw.js").catch(() => {}); });
     }
   </script>
 </body>
